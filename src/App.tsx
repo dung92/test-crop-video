@@ -270,8 +270,6 @@ export default function VideoThumbnails() {
             onChange={handleSliderChange}
             style={{ width: "600px", marginTop: 10 }}
           />
-
-          {/* Frames thumbnail */}
           <div
             style={{
               display: "flex",
