@@ -4,7 +4,7 @@ import { Rnd } from "react-rnd";
 
 const ffmpeg = createFFmpeg({
   log: true,
-  corePath: "/ffmpeg/ffmpeg-core.js", // đặt trong public/ffmpeg/
+  corePath: "/ffmpeg/ffmpeg-core.js", 
 });
 
 export default function VideoThumbnails() {
@@ -37,13 +37,10 @@ export default function VideoThumbnails() {
     load();
   }, []);
 
-  // Khi load video -> tạo vùng crop mặc định
   const handleLoadedMetadata = () => {
     if (!videoRef.current) return;
     const w = videoRef.current.videoWidth;
     const h = videoRef.current.videoHeight;
-
-    // crop mặc định 50% giữa video
     setCrop({
       x: w / 4,
       y: h / 4,
@@ -84,9 +81,15 @@ export default function VideoThumbnails() {
       const output = `frame_${i}.jpg`;
 
       await ffmpeg.run("-ss", String(timestamp), "-i", "input.mp4", "-frames:v", "1", output);
+      const data = ffmpeg.FS("readFile", "output.mp4");
+      const buffer = data.buffer.slice(
+        data.byteOffset,
+        data.byteOffset + data.byteLength
+      ) as ArrayBuffer;
 
-      const data = ffmpeg.FS("readFile", output);
-      const url = URL.createObjectURL(new Blob([data.buffer], { type: "image/jpeg" }));
+      const url = URL.createObjectURL(
+        new Blob([buffer], { type: "video/mp4" })
+      );
       frames.push(url);
     }
 
@@ -152,7 +155,14 @@ export default function VideoThumbnails() {
     await ffmpeg.run(...args);
 
     const data = ffmpeg.FS("readFile", "output.mp4");
-    const url = URL.createObjectURL(new Blob([data.buffer], { type: "video/mp4" }));
+    const buffer = data.buffer.slice(
+      data.byteOffset,
+      data.byteOffset + data.byteLength
+    ) as ArrayBuffer;
+
+    const url = URL.createObjectURL(
+      new Blob([buffer], { type: "video/mp4" })
+    );
     setCroppedUrl(url);
     setProcessing(false);
   };
@@ -191,7 +201,6 @@ export default function VideoThumbnails() {
               onTimeUpdate={(e) => setCurrentTime((e.target as HTMLVideoElement).currentTime)}
             />
 
-            {/* Crop box draggable + resizable */}
             {crop && (
               <Rnd
                 bounds="parent"
@@ -215,8 +224,6 @@ export default function VideoThumbnails() {
               />
             )}
           </div>
-
-          {/* Input chỉnh crop box */}
           {crop && (
             <div style={{ marginTop: 10, display: "flex", gap: 10 }}>
               <label>
