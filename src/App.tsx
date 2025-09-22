@@ -7,7 +7,7 @@ const ffmpeg = createFFmpeg({
   corePath: "/ffmpeg/ffmpeg-core.js", 
 });
 
-export default function VideoThumbnails() {
+export default function App() {
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const [thumbnails, setThumbnails] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
